@@ -1,199 +1,470 @@
-:root {
-    --primary-color: #8B4513;
-    --secondary-color: #D2691E;
-    --accent-color: #F4A460;
-    --light-color: #FFF8DC;
-    --dark-color: #5D4037;
+// Kecepatan transportasi dalam km/jam
+const transportSpeeds = {
+    walking: 5,
+    bicycle: 15,
+    motorcycle: 40,
+    car: 50,
+    public: 20
+};
+
+// Variabel global
+let presets = JSON.parse(localStorage.getItem('antiTelatPresets')) || [];
+let currentPresetId = null;
+let chart = null;
+
+$(document).ready(function() {
+    // Tampilkan halaman awal
+    showStartPage();
+    
+    // Event listener untuk tombol buat preset baru
+    $('#create-new-preset').click(function() {
+        showPresetPage();
+        $('#preset-page-title').text('Buat Preset Baru');
+        $('#preset-form')[0].reset();
+        $('#custom-activities').empty();
+        $('#results-section').addClass('d-none');
+        currentPresetId = null;
+    });
+    
+    // Event listener untuk kembali ke halaman preset
+    $('#back-to-presets').click(function() {
+        showStartPage();
+    });
+    
+    // Event listener untuk tombol tambah aktivitas kustom
+    $('#add-custom-activity').click(function() {
+        addCustomActivity();
+    });
+    
+    // Event listener untuk form preset
+    $('#preset-form').submit(function(e) {
+        e.preventDefault();
+        savePreset();
+        calculateResults();
+        $('#results-section').removeClass('d-none');
+    });
+    
+    // Event listener untuk tombol edit preset
+    $('#edit-preset').click(function() {
+        $('#results-section').addClass('d-none');
+    });
+});
+
+// Fungsi untuk menampilkan halaman awal
+function showStartPage() {
+    $('#start-page').removeClass('d-none');
+    $('#preset-page').addClass('d-none');
+    loadPresets();
 }
 
-body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: var(--light-color);
-    color: var(--dark-color);
-    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect fill="none" width="100" height="100"/><path fill="%238B4513" opacity="0.1" d="M30,30 C40,20 60,20 70,30 C80,40 80,60 70,70 C60,80 40,80 30,70 C20,60 20,40 30,30 Z"/></svg>');
+// Fungsi untuk menampilkan halaman preset
+function showPresetPage() {
+    $('#start-page').addClass('d-none');
+    $('#preset-page').removeClass('d-none');
 }
 
-.jawa-timur-theme {
-    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-    color: white;
-    border-radius: 10px;
-    padding: 20px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-}
-
-.btn-jawa {
-    background-color: var(--primary-color);
-    color: white;
-    border: none;
-}
-
-.btn-jawa:hover {
-    background-color: var(--secondary-color);
-    color: white;
-}
-
-.btn-outline-jawa {
-    border-color: var(--primary-color);
-    color: var(--primary-color);
-}
-
-.btn-outline-jawa:hover {
-    background-color: var(--primary-color);
-    color: white;
-}
-
-.card-jawa {
-    border: 2px solid var(--primary-color);
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-}
-
-.form-control:focus {
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 0.25rem rgba(139, 69, 19, 0.25);
-}
-
-.form-select:focus {
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 0.25rem rgba(139, 69, 19, 0.25);
-}
-
-.custom-activity-item {
-    background-color: #f8f9fa;
-    border: 1px solid #dee2e6;
-    border-radius: 5px;
-    padding: 10px;
-    margin-bottom: 10px;
-}
-
-.result-box {
-    background-color: white;
-    border-radius: 10px;
-    padding: 20px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-    margin-top: 20px;
-}
-
-.percentage-display {
-    font-size: 2rem;
-    font-weight: bold;
-    text-align: center;
-    margin: 10px 0;
-}
-
-.time-range {
-    font-size: 1.2rem;
-    text-align: center;
-    margin: 10px 0;
-}
-
-.preset-card {
-    cursor: pointer;
-    transition: transform 0.2s;
-}
-
-.preset-card:hover {
-    transform: translateY(-5px);
-}
-
-.batik-pattern {
-    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewBox="0 0 60 60"><path fill="%238B4513" opacity="0.1" d="M30,5 C40,5 50,10 55,20 C60,30 55,40 45,45 C35,50 25,50 15,45 C5,40 0,30 5,20 C10,10 20,5 30,5 Z"/></svg>');
-}
-
-footer {
-    background-color: var(--dark-color);
-    color: white;
-    padding: 20px 0;
-    margin-top: 40px;
-}
-
-.logo {
-    font-weight: bold;
-    font-size: 1.5rem;
-    color: var(--primary-color);
-}
-
-/* Responsive Design */
-@media (max-width: 768px) {
-    .jawa-timur-theme {
-        padding: 15px;
+// Fungsi untuk memuat daftar preset
+function loadPresets() {
+    const presetList = $('#preset-list');
+    presetList.empty();
+    
+    if (presets.length === 0) {
+        presetList.html('<div class="col-12 text-center"><p>Belum ada preset. Buat preset baru untuk memulai.</p></div>');
+        return;
     }
     
-    .percentage-display {
-        font-size: 1.5rem;
+    presets.forEach((preset, index) => {
+        const card = `
+            <div class="col-md-6 col-lg-4">
+                <div class="card preset-card card-jawa p-3" data-id="${index}">
+                    <h5 class="card-title">${preset.name}</h5>
+                    <p class="card-text mb-1">Jarak: ${preset.distance} km</p>
+                    <p class="card-text mb-1">Transportasi: ${getTransportationName(preset.transportation)}</p>
+                    <p class="card-text mb-1">Waktu Sekolah: ${preset.schoolTime}</p>
+                    <div class="d-flex justify-content-between mt-2">
+                        <button class="btn btn-jawa btn-sm use-preset">Gunakan</button>
+                        <button class="btn btn-outline-jawa btn-sm edit-preset">Edit</button>
+                        <button class="btn btn-outline-danger btn-sm delete-preset">Hapus</button>
+                    </div>
+                </div>
+            </div>
+        `;
+        presetList.append(card);
+    });
+    
+    // Event listener untuk tombol gunakan preset
+    $('.use-preset').click(function() {
+        const card = $(this).closest('.preset-card');
+        const presetId = card.data('id');
+        usePreset(presetId);
+    });
+    
+    // Event listener untuk tombol edit preset
+    $('.edit-preset').click(function() {
+        const card = $(this).closest('.preset-card');
+        const presetId = card.data('id');
+        editPreset(presetId);
+    });
+    
+    // Event listener untuk tombol hapus preset
+    $('.delete-preset').click(function() {
+        const card = $(this).closest('.preset-card');
+        const presetId = card.data('id');
+        deletePreset(presetId);
+    });
+}
+
+// Fungsi untuk mendapatkan nama transportasi
+function getTransportationName(key) {
+    const names = {
+        walking: 'Jalan Kaki',
+        bicycle: 'Sepeda',
+        motorcycle: 'Motor',
+        car: 'Mobil',
+        public: 'Transportasi Umum'
+    };
+    return names[key] || key;
+}
+
+// Fungsi untuk menggunakan preset
+function usePreset(presetId) {
+    const preset = presets[presetId];
+    currentPresetId = presetId;
+    
+    // Isi form dengan data preset
+    $('#preset-name').val(preset.name);
+    $('#school-time').val(preset.schoolTime);
+    $('#distance').val(preset.distance);
+    $('#transportation').val(preset.transportation);
+    $('#departure-time').val(preset.departureTime);
+    $('#meal-duration').val(preset.mealDuration || 0);
+    $('#bath-duration').val(preset.bathDuration || 0);
+    
+    // Hapus aktivitas kustom yang ada
+    $('#custom-activities').empty();
+    
+    // Tambahkan aktivitas kustom
+    if (preset.customActivities && preset.customActivities.length > 0) {
+        preset.customActivities.forEach(activity => {
+            addCustomActivity(activity.name, activity.duration);
+        });
     }
     
-    .logo {
-        font-size: 1.2rem;
+    showPresetPage();
+    $('#preset-page-title').text(`Edit Preset: ${preset.name}`);
+    calculateResults();
+    $('#results-section').removeClass('d-none');
+}
+
+// Fungsi untuk mengedit preset
+function editPreset(presetId) {
+    usePreset(presetId);
+    $('#results-section').addClass('d-none');
+}
+
+// Fungsi untuk menghapus preset
+function deletePreset(presetId) {
+    if (confirm('Apakah Anda yakin ingin menghapus preset ini?')) {
+        presets.splice(presetId, 1);
+        localStorage.setItem('antiTelatPresets', JSON.stringify(presets));
+        loadPresets();
+        
+        // Tampilkan pesan sukses
+        showNotification('Preset berhasil dihapus!', 'success');
+    }
+}
+
+// Fungsi untuk menambah aktivitas kustom
+function addCustomActivity(name = '', duration = 0) {
+    const activityId = Date.now();
+    const activityHtml = `
+        <div class="custom-activity-item" data-id="${activityId}">
+            <div class="row g-2">
+                <div class="col-md-5">
+                    <input type="text" class="form-control activity-name" placeholder="Nama Aktivitas" value="${name}">
+                </div>
+                <div class="col-md-4">
+                    <input type="number" class="form-control activity-duration" placeholder="Durasi (menit)" min="0" value="${duration}">
+                </div>
+                <div class="col-md-3">
+                    <button type="button" class="btn btn-outline-danger btn-sm w-100 remove-activity">Hapus</button>
+                </div>
+            </div>
+        </div>
+    `;
+    $('#custom-activities').append(activityHtml);
+    
+    // Event listener untuk tombol hapus aktivitas
+    $(`.custom-activity-item[data-id="${activityId}"] .remove-activity`).click(function() {
+        $(this).closest('.custom-activity-item').remove();
+    });
+}
+
+// Fungsi untuk menyimpan preset
+function savePreset() {
+    const presetData = {
+        name: $('#preset-name').val(),
+        schoolTime: $('#school-time').val(),
+        distance: parseFloat($('#distance').val()),
+        transportation: $('#transportation').val(),
+        departureTime: $('#departure-time').val(),
+        mealDuration: parseInt($('#meal-duration').val()) || 0,
+        bathDuration: parseInt($('#bath-duration').val()) || 0,
+        customActivities: []
+    };
+    
+    // Kumpulkan aktivitas kustom
+    $('.custom-activity-item').each(function() {
+        const name = $(this).find('.activity-name').val();
+        const duration = parseInt($(this).find('.activity-duration').val()) || 0;
+        
+        if (name && duration > 0) {
+            presetData.customActivities.push({
+                name: name,
+                duration: duration
+            });
+        }
+    });
+    
+    // Validasi data
+    if (!validatePresetData(presetData)) {
+        return;
     }
     
-    .time-range {
-        font-size: 1rem;
-    }
-}
-
-@media (max-width: 576px) {
-    .jawa-timur-theme {
-        padding: 10px;
-    }
-    
-    h1 {
-        font-size: 1.5rem;
+    // Simpan atau perbarui preset
+    if (currentPresetId !== null) {
+        // Perbarui preset yang ada
+        presets[currentPresetId] = presetData;
+        showNotification('Preset berhasil diperbarui!', 'success');
+    } else {
+        // Tambahkan preset baru
+        presets.push(presetData);
+        currentPresetId = presets.length - 1;
+        showNotification('Preset berhasil disimpan!', 'success');
     }
     
-    h2 {
-        font-size: 1.3rem;
+    // Simpan ke localStorage
+    localStorage.setItem('antiTelatPresets', JSON.stringify(presets));
+    
+    // Perbarui judul halaman
+    $('#preset-page-title').text(`Edit Preset: ${presetData.name}`);
+}
+
+// Fungsi untuk validasi data preset
+function validatePresetData(presetData) {
+    if (!presetData.name.trim()) {
+        showNotification('Nama preset harus diisi!', 'error');
+        return false;
     }
     
-    .btn-lg {
-        padding: 0.5rem 1rem;
-        font-size: 1rem;
+    if (presetData.distance <= 0) {
+        showNotification('Jarak harus lebih dari 0!', 'error');
+        return false;
     }
+    
+    if (!presetData.transportation) {
+        showNotification('Pilih jenis transportasi!', 'error');
+        return false;
+    }
+    
+    return true;
 }
 
-/* Chart Styling */
-.chart-container {
-    position: relative;
-    height: 300px;
-    width: 100%;
+// Fungsi untuk menampilkan notifikasi
+function showNotification(message, type = 'info') {
+    // Hapus notifikasi sebelumnya
+    $('.alert-notification').remove();
+    
+    const alertClass = type === 'error' ? 'alert-danger' : 
+                      type === 'success' ? 'alert-success' : 'alert-info';
+    
+    const notification = $(`
+        <div class="alert ${alertClass} alert-dismissible fade show alert-notification" role="alert">
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    `);
+    
+    $('main').prepend(notification);
+    
+    // Auto hide setelah 3 detik
+    setTimeout(() => {
+        notification.alert('close');
+    }, 3000);
 }
 
-/* Loading Animation */
-.loading {
-    display: inline-block;
-    width: 20px;
-    height: 20px;
-    border: 3px solid rgba(255,255,255,.3);
-    border-radius: 50%;
-    border-top-color: #fff;
-    animation: spin 1s ease-in-out infinite;
+// Fungsi untuk menghitung hasil
+function calculateResults() {
+    const presetData = {
+        distance: parseFloat($('#distance').val()),
+        transportation: $('#transportation').val(),
+        departureTime: $('#departure-time').val(),
+        schoolTime: $('#school-time').val(),
+        mealDuration: parseInt($('#meal-duration').val()) || 0,
+        bathDuration: parseInt($('#bath-duration').val()) || 0,
+        customActivities: []
+    };
+    
+    // Kumpulkan aktivitas kustom
+    $('.custom-activity-item').each(function() {
+        const name = $(this).find('.activity-name').val();
+        const duration = parseInt($(this).find('.activity-duration').val()) || 0;
+        
+        if (name && duration > 0) {
+            presetData.customActivities.push({
+                name: name,
+                duration: duration
+            });
+        }
+    });
+    
+    // Hitung waktu perjalanan
+    const speed = transportSpeeds[presetData.transportation] || 20; // km/jam
+    const travelTimeMinutes = (presetData.distance / speed) * 60;
+    
+    // Hitung total waktu aktivitas
+    let totalActivityMinutes = presetData.mealDuration + presetData.bathDuration;
+    presetData.customActivities.forEach(activity => {
+        totalActivityMinutes += activity.duration;
+    });
+    
+    // Konversi waktu berangkat ke menit sejak tengah malam
+    const [departureHours, departureMinutes] = presetData.departureTime.split(':').map(Number);
+    const departureTotalMinutes = departureHours * 60 + departureMinutes;
+    
+    // Hitung waktu tiba tercepat (tanpa aktivitas)
+    const fastestArrivalMinutes = departureTotalMinutes + travelTimeMinutes;
+    const fastestArrivalTime = minutesToTime(fastestArrivalMinutes);
+    
+    // Hitung waktu tiba terlama (dengan semua aktivitas)
+    const slowestArrivalMinutes = departureTotalMinutes + travelTimeMinutes + totalActivityMinutes;
+    const slowestArrivalTime = minutesToTime(slowestArrivalMinutes);
+    
+    // Tampilkan rentang waktu tiba
+    $('#arrival-range').html(`${fastestArrivalTime} - ${slowestArrivalTime}`);
+    
+    // Hitung persentase keterlambatan
+    const [schoolHours, schoolMinutes] = presetData.schoolTime.split(':').map(Number);
+    const schoolTotalMinutes = schoolHours * 60 + schoolMinutes;
+    
+    let latePercentage = 0;
+    if (slowestArrivalMinutes > schoolTotalMinutes) {
+        // Jika waktu tiba terlama melebihi waktu sekolah
+        const minutesLate = slowestArrivalMinutes - schoolTotalMinutes;
+        // Persentase berdasarkan seberapa terlambat (maksimal 100%)
+        latePercentage = Math.min(100, Math.round((minutesLate / 60) * 100));
+    }
+    
+    // Tampilkan persentase keterlambatan dengan warna yang sesuai
+    const percentageElement = $('#late-percentage');
+    percentageElement.text(`${latePercentage}%`);
+    
+    // Ubah warna berdasarkan persentase
+    if (latePercentage === 0) {
+        percentageElement.removeClass('text-warning text-danger').addClass('text-success');
+    } else if (latePercentage <= 50) {
+        percentageElement.removeClass('text-success text-danger').addClass('text-warning');
+    } else {
+        percentageElement.removeClass('text-success text-warning').addClass('text-danger');
+    }
+    
+    // Buat chart
+    createChart(presetData, fastestArrivalMinutes, slowestArrivalMinutes, schoolTotalMinutes);
 }
 
-@keyframes spin {
-    to { transform: rotate(360deg); }
+// Fungsi untuk mengonversi menit ke format waktu
+function minutesToTime(totalMinutes) {
+    const hours = Math.floor(totalMinutes / 60) % 24;
+    const minutes = Math.floor(totalMinutes % 60);
+    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
 }
 
-/* Success/Error States */
-.text-success {
-    color: #28a745 !important;
+// Fungsi untuk membuat chart
+function createChart(presetData, fastestArrival, slowestArrival, schoolTime) {
+    const ctx = document.getElementById('time-chart').getContext('2d');
+    
+    // Hancurkan chart sebelumnya jika ada
+    if (chart) {
+        chart.destroy();
+    }
+    
+    // Siapkan data untuk chart
+    const departureTime = presetData.departureTime;
+    const schoolTimeStr = presetData.schoolTime;
+    const fastestArrivalStr = minutesToTime(fastestArrival);
+    const slowestArrivalStr = minutesToTime(slowestArrival);
+    
+    // Tentukan warna berdasarkan keterlambatan
+    const isLate = slowestArrival > schoolTime;
+    
+    // Buat chart baru
+    chart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ['Waktu Berangkat', 'Tiba Tercepat', 'Tiba Terlama', 'Waktu Sekolah'],
+            datasets: [{
+                label: 'Waktu',
+                data: [
+                    timeToMinutes(presetData.departureTime),
+                    fastestArrival,
+                    slowestArrival,
+                    schoolTime
+                ],
+                backgroundColor: [
+                    'rgba(54, 162, 235, 0.7)',    // Biru untuk berangkat
+                    'rgba(75, 192, 192, 0.7)',    // Hijau untuk tiba tercepat
+                    isLate ? 'rgba(255, 99, 132, 0.7)' : 'rgba(255, 159, 64, 0.7)', // Merah jika telat, oranye jika tidak
+                    'rgba(153, 102, 255, 0.7)'    // Ungu untuk waktu sekolah
+                ],
+                borderColor: [
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(75, 192, 192, 1)',
+                    isLate ? 'rgba(255, 99, 132, 1)' : 'rgba(255, 159, 64, 1)',
+                    'rgba(153, 102, 255, 1)'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            indexAxis: 'y',
+            scales: {
+                x: {
+                    type: 'linear',
+                    position: 'bottom',
+                    min: timeToMinutes('04:00'), // Mulai dari jam 4 pagi
+                    max: timeToMinutes('10:00'), // Sampai jam 10 pagi (bisa disesuaikan)
+                    ticks: {
+                        callback: function(value) {
+                            return minutesToTime(value);
+                        }
+                    },
+                    title: {
+                        display: true,
+                        text: 'Waktu (HH:MM)'
+                    }
+                }
+            },
+            plugins: {
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const value = context.parsed.x;
+                            return minutesToTime(value);
+                        }
+                    }
+                },
+                legend: {
+                    display: false
+                }
+            },
+            responsive: true,
+            maintainAspectRatio: false
+        }
+    });
 }
 
-.text-warning {
-    color: #ffc107 !important;
-}
-
-.text-danger {
-    color: #dc3545 !important;
-}
-
-.bg-success {
-    background-color: #28a745 !important;
-}
-
-.bg-warning {
-    background-color: #ffc107 !important;
-}
-
-.bg-danger {
-    background-color: #dc3545 !important;
+// Fungsi untuk mengonversi waktu ke menit
+function timeToMinutes(timeStr) {
+    const [hours, minutes] = timeStr.split(':').map(Number);
+    return hours * 60 + minutes;
 }
