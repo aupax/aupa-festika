@@ -2,7 +2,7 @@
     "name": "Alarm Mobile",
     "short_name": "Alarm",
     "description": "Aplikasi alarm sederhana dengan notifikasi",
-    "start_url": "/",
+    "start_url": "/index.html",
     "display": "standalone",
     "background_color": "#667eea",
     "theme_color": "#667eea",
