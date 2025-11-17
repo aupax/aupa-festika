@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Kalkulator Risiko Telat Sekolah - Arek Jatim Edition</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="container">
+        <h1>Kalkulator Risiko Telat Sekolah<br><span>Arek Jatim Edition</span></h1>
+
+        <div class="card">
+
+            <label>Jarak ke sekolah (km)</label>
+            <input type="number" id="jarak" min="0" step="0.1" placeholder="Contoh: 5">
+
+            <label>Transportasi</label>
+            <select id="transport">
+                <option value="motor">Motor</option>
+                <option value="sepeda">Sepeda</option>
+                <option value="jalan">Jalan Kaki</option>
+                <option value="nebeng">Nebeng Teman</option>
+            </select>
+
+            <label>Tingkat Macet</label>
+            <select id="macet">
+                <option value="sepi">Sepi</option>
+                <option value="sedang">Sedang</option>
+                <option value="macet">Rawan Macet</option>
+            </select>
+
+            <label>Snooze Alarm</label>
+            <select id="snooze">
+                <option value="0">0 kali</option>
+                <option value="1-2">1–2 kali</option>
+                <option value="3+">3+ kali</option>
+            </select>
+
+            <label>Durasi Mandi</label>
+            <select id="mandi">
+                <option value="5">5 menit</option>
+                <option value="10">10 menit</option>
+                <option value="20">20 menit</option>
+            </select>
+
+            <label>Jam Berangkat</label>
+            <input type="time" id="berangkat">
+
+            <button id="hitungBtn">Hitung Risiko</button>
+        </div>
+
+        <div id="hasil" class="result">
+            <!-- hasil perhitungan muncul disini -->
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
