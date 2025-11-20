@@ -32,6 +32,7 @@ $(document).ready(function() {
 function initializeApp() {
     loadjadwals();
     showPage('page-start');
+    createWeeklyChart();
 }
 
 // Setup Event Listeners
@@ -90,21 +91,26 @@ function loadjadwals() {
     }
 
     jadwals.forEach(function(jadwal) {
+        // Ubah struktur jadwal card dengan tombol di kanan
         const jadwalCard = $(`
             <div class="jadwal-card">
-                <div class="jadwal-actions">
-                    <button class="btn btn-sm btn-warning btn-edit-jadwal" data-id="${jadwal.id}">
-                        <i class="fas fa-edit"></i> Edit
-                    </button>
-                    <button class="btn btn-sm btn-danger btn-delete-jadwal" data-id="${jadwal.id}">
-                        <i class="fas fa-trash"></i> Hapus
-                    </button>
-                </div>
-                <div class="jadwal-name">${jadwal.name}</div>
-                <div class="jadwal-info">
-                    <i class="fas fa-route"></i> ${jadwal.jarak} km | 
-                    <i class="fas fa-motorcycle"></i> ${NAMA_TRANSPORTASI[jadwal.transportasi]} | 
-                    <i class="fas fa-clock"></i> Berangkat ${jadwal.jamBerangkat}
+                <div class="d-flex justify-content-between align-items-start">
+                    <div class="flex-grow-1">
+                        <div class="jadwal-name">${jadwal.name}</div>
+                        <div class="jadwal-info">
+                            <i class="fas fa-route"></i> ${jadwal.jarak} km | 
+                            <i class="fas fa-motorcycle"></i> ${NAMA_TRANSPORTASI[jadwal.transportasi]} | 
+                            <i class="fas fa-clock"></i> Berangkat ${jadwal.jamBerangkat}
+                        </div>
+                    </div>
+                    <div class="jadwal-actions ms-3">
+                        <button class="btn btn-sm btn-outline-warning btn-edit-jadwal" data-id="${jadwal.id}" title="Edit Jadwal">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn btn-sm btn-outline-danger btn-delete-jadwal" data-id="${jadwal.id}" title="Hapus Jadwal">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
                 </div>
             </div>
         `);
@@ -134,6 +140,56 @@ function loadjadwals() {
         if (confirm('Yakin ingin menghapus jadwal ini?')) {
             deletejadwal(id);
             loadjadwals();
+        }
+    });
+}
+
+// Fungsi baru untuk membuat chart mingguan
+function createWeeklyChart() {
+    const ctx = document.getElementById('weekly-chart');
+    
+    // Data dummy untuk contoh (dalam aplikasi nyata, data ini bisa diambil dari localStorage)
+    const days = ['Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab', 'Min'];
+    const latePercentages = [15, 25, 10, 30, 5, 0, 20]; // Data contoh
+    
+    // Hitung rata-rata
+    const average = latePercentages.reduce((a, b) => a + b, 0) / latePercentages.length;
+    
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: days,
+            datasets: [{
+                label: 'Persentase Telat (%)',
+                data: latePercentages,
+                backgroundColor: [
+                    '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', 
+                    '#9966FF', '#FF9F40', '#C9CBCF'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                title: {
+                    display: true,
+                    text: `Rata-rata: ${average.toFixed(1)}%`
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 100,
+                    title: {
+                        display: true,
+                        text: 'Persentase Telat (%)'
+                    }
+                }
+            }
         }
     });
 }
