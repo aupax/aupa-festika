@@ -26,23 +26,36 @@
     <main class="flex-grow-1">
     <div class="container my-4">
         <!-- Halaman Start -->
-        <div id="page-start" class="page active">
-            <div class="card kartu-fresh mx-auto">
-                <div class="card-body text-center p-4">
-                    <i class="fas fa-graduation-cap fa-4x mb-3 text-warning"></i>
-                    <h2 class="mb-2">Pilih Jadwal</h2>
-                    <p class="mb-3">Pilih jadwal yang sudah ada atau buat jadwal baru</p>
-                    
-                    <div id="jadwal-list" class="mb-3 row gx-3 gy-3 justify-content-center">
-                        <!-- Jadwal list akan dimuat di sini -->
-                    </div>
+<div id="page-start" class="page active">
+    <div class="card kartu-fresh mx-auto">
+        <div class="card-body text-center p-4">
+            <i class="fas fa-graduation-cap fa-4x mb-3 text-warning"></i>
+            <h2 class="mb-2">Pilih Jadwal</h2>
+            <p class="mb-3">Pilih jadwal yang sudah ada atau buat jadwal baru</p>
+            
+            <div id="jadwal-list" class="mb-3 row gx-3 gy-3 justify-content-center">
+                <!-- Jadwal list akan dimuat di sini -->
+            </div>
 
-                    <button class="btn btn-primary btn-lg btn-fresh" id="btn-create-jadwal">
-                        <i class="fas fa-plus"></i> Buat Jadwal Baru
-                    </button>
+            <button class="btn btn-primary btn-lg btn-fresh mt-4" id="btn-create-jadwal">
+                <i class="fas fa-plus"></i> Buat Jadwal Baru
+            </button>
+
+            <!-- Tambahkan chart persentase telat mingguan -->
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-chart-bar"></i> Statistik Keterlambatan Minggu Ini</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="weekly-chart" width="400" height="200"></canvas>
+                    <p class="text-muted mt-2 small">Rata-rata persentase keterlambatan dalam 7 hari terakhir</p>
                 </div>
             </div>
+
+            
         </div>
+    </div>
+</div>
 
         <!-- Halaman Buat/Edit Jadwal -->
         <div id="page-jadwal" class="page">
