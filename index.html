@@ -9,6 +9,59 @@
     <link rel="stylesheet" href="assets/style.css">
 </head>
 <body>
+    <!-- Popup Welcome -->
+    <div id="welcome-popup" class="welcome-popup">
+        <div class="popup-overlay"></div>
+        <div class="popup-content">
+            <div class="popup-header">
+                <img src="assets/images/logo.png" alt="Logo WANCISA" class="popup-logo">
+                <h2>Selamat Datang di WANCISA</h2>
+                <p class="popup-subtitle">Wancine Sekolah - Ojo Sampek Telat!</p>
+            </div>
+            
+            <div class="popup-body">
+                <div class="feature-item">
+                    <i class="fas fa-route feature-icon"></i>
+                    <div class="feature-text">
+                        <h5>Atur Jadwal Perjalanan</h5>
+                        <p>Hitung waktu tempuh dengan berbagai transportasi</p>
+                    </div>
+                </div>
+                
+                <div class="feature-item">
+                    <i class="fas fa-calculator feature-icon"></i>
+                    <div class="feature-text">
+                        <h5>Prediksi Keterlambatan</h5>
+                        <p>Dapatkan estimasi persentase keterlambatan</p>
+                    </div>
+                </div>
+                
+                <div class="feature-item">
+                    <i class="fas fa-chart-pie feature-icon"></i>
+                    <div class="feature-text">
+                        <h5>Statistik Mingguan</h5>
+                        <p>Pantau perkembangan keterlambatan dalam seminggu</p>
+                    </div>
+                </div>
+                
+                <div class="feature-item">
+                    <i class="fas fa-bell feature-icon"></i>
+                    <div class="feature-text">
+                        <h5>Pengingat Cerdas</h5>
+                        <p>Atur aktivitas dan dapatkan peringatan tepat waktu</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="popup-footer">
+                <button id="start-button" class="btn btn-primary btn-lg btn-start">
+                    <i class="fas fa-play-circle"></i> Mulai Sekarang
+                </button>
+                <p class="popup-note">Aplikasi ini akan membantu Anda mengatur jadwal sekolah dengan lebih baik</p>
+            </div>
+        </div>
+    </div>
+
     <!-- Header -->
     <header class="site-header py-3">
         <div class="container">
@@ -57,102 +110,96 @@
     </div>
 </div>
 
-        <!-- Halaman Buat/Edit Jadwal -->
-        <div id="page-jadwal" class="page">
-            <div class="card kartu-fresh mx-auto">
-                <div class="card-header">
-                    <h3><i class="fas fa-edit"></i> <span id="jadwal-title">Buat Jadwal Baru</span></h3>
-                </div>
-                <div class="card-body">
-                    <form id="form-jadwal">
-                        <input type="hidden" id="jadwal-id">
-                        
-                        <!-- Nama Jadwal -->
-                        <div class="mb-3">
-                            <label class="form-label fw-bold">Nama Jadwal</label>
-                            <input type="text" class="form-control" id="jadwal-name" placeholder="Contoh: Jadwal Normal" required>
-                        </div>
-
-                        <!-- Jarak -->
-                        <div class="mb-3">
-                            <label class="form-label fw-bold">Jarak dari Rumah ke Sekolah (km)</label>
-                            <input type="number" class="form-control" id="jarak" step="0.1" min="0.1" placeholder="Contoh: 5.5" required>
-                        </div>
-
-                        <!-- Transportasi -->
-                        <div class="mb-3">
-                            <label class="form-label fw-bold">Transportasi</label>
-                            <select class="form-select" id="transportasi" required>
-                                <option value="">Pilih Transportasi</option>
-                                <option value="jalan_kaki">Jalan Kaki (20 km/jam)</option>
-                                <option value="sepeda">Sepeda (35 km/jam)</option>
-                                <option value="motor">Motor (60 km/jam)</option>
-                                <option value="mobil">Mobil (55 km/jam)</option>
-                                <option value="transportasi_umum">Transportasi Umum (45 km/jam)</option>
-                            </select>
-                        </div>
-
-                        <!-- Jam Berangkat -->
-                        <div class="mb-3">
-                            <label class="form-label fw-bold">Jam Berangkat</label>
-                            <input type="time" class="form-control" id="jam-berangkat" required>
-                        </div>
-
-                        <!-- Waktu Masuk Sekolah -->
-                        <div class="mb-3">
-                            <label class="form-label fw-bold">Waktu Masuk Sekolah</label>
-                            <input type="time" class="form-control" id="waktu-masuk" required>
-                        </div>
-
-                        <!-- Aktivitas Optional -->
-                        <div class="mb-3">
-                            <label class="form-label fw-bold">Aktivitas Optional</label>
-                            
-                            <div class="mb-2">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" id="checkbox-makan">
-                                    <label class="form-check-label" for="checkbox-makan">Makan</label>
-                                </div>
-                                <div class="durasi-input mt-2" id="durasi-makan-container" style="display:none;">
-                                    <input type="number" class="form-control" id="durasi-makan" placeholder="Durasi (menit)" min="1">
-                                </div>
-                            </div>
-
-                            <div class="mb-2">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" id="checkbox-mandi">
-                                    <label class="form-check-label" for="checkbox-mandi">Mandi</label>
-                                </div>
-                                <div class="durasi-input mt-2" id="durasi-mandi-container" style="display:none;">
-                                    <input type="number" class="form-control" id="durasi-mandi" placeholder="Durasi (menit)" min="1">
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Aktivitas Custom -->
-                        <div class="mb-3">
-                            <label class="form-label fw-bold">Aktivitas Custom</label>
-                            <div id="custom-activities-list"></div>
-                            <button type="button" class="btn btn-secondary btn-sm mt-2" id="btn-add-custom">
-                                <i class="fas fa-plus"></i> Tambah Aktivitas
-                            </button>
-                        </div>
-
-                        <!-- Tombol Aksi -->
-                        <div class="d-flex gap-2 justify-content-between">
-                            <button type="button" class="btn btn-secondary" id="btn-back-start">
-                                <i class="fas fa-arrow-left"></i> Kembali
-                            </button>
-                            <div class="d-flex gap-2">
-                                <button type="submit" class="btn btn-success btn-fresh">
-                                    <i class="fas fa-save"></i> Simpan & Hitung
-                                </button>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-            </div>
+<!-- Halaman Buat/Edit Jadwal -->
+<div id="page-jadwal" class="page">
+    <div class="card kartu-fresh mx-auto">
+        <div class="card-header">
+            <h3><i class="fas fa-edit"></i> <span id="jadwal-title">Buat Jadwal Baru</span></h3>
         </div>
+        <div class="card-body">
+            <form id="form-jadwal">
+                <input type="hidden" id="jadwal-id">
+                
+                <!-- Nama Jadwal -->
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Nama Jadwal</label>
+                    <input type="text" class="form-control" id="jadwal-name" placeholder="Contoh: Jadwal Normal" required>
+                </div>
+
+                <!-- Jarak -->
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Jarak dari Rumah ke Sekolah (km)</label>
+                    <input type="number" class="form-control" id="jarak" step="0.1" min="0.1" placeholder="Contoh: 5.5" required>
+                </div>
+
+                <!-- Transportasi -->
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Transportasi</label>
+                    <select class="form-select" id="transportasi" required>
+                        <option value="">Pilih Transportasi</option>
+                        <option value="jalan_kaki">Jalan Kaki (20 km/jam)</option>
+                        <option value="sepeda">Sepeda (35 km/jam)</option>
+                        <option value="motor">Motor (60 km/jam)</option>
+                        <option value="mobil">Mobil (55 km/jam)</option>
+                        <option value="transportasi_umum">Transportasi Umum (45 km/jam)</option>
+                        <option value="custom">Atur Kecepatan Sendiri</option>
+                    </select>
+                </div>
+
+                <!-- Custom Kecepatan (muncul hanya jika pilih "Atur Kecepatan Sendiri") -->
+                <div class="mb-3" id="custom-kecepatan-container" style="display: none;">
+                    <label class="form-label fw-bold">Kecepatan Custom (km/jam)</label>
+                    <input type="number" class="form-control" id="custom-kecepatan" min="1" max="200" placeholder="Contoh: 40">
+                    <div class="form-text">Masukkan kecepatan rata-rata kendaraan Anda dalam km/jam</div>
+                </div>
+
+                <!-- Tingkat Kemacetan -->
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Tingkat Kemacetan</label>
+                    <select class="form-select" id="tingkat-kemacetan" required>
+                        <option value="sepi">Sepi (Tidak ada penambahan waktu)</option>
+                        <option value="sedang">Sedang (+15% waktu perjalanan)</option>
+                        <option value="macet">Macet (+30% waktu perjalanan)</option>
+                    </select>
+                </div>
+
+                <!-- Jam Berangkat -->
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Jam Berangkat</label>
+                    <input type="time" class="form-control" id="jam-berangkat" required>
+                </div>
+
+                <!-- Waktu Masuk Sekolah -->
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Waktu Masuk Sekolah</label>
+                    <input type="time" class="form-control" id="waktu-masuk" required>
+                </div>
+
+                <!-- Aktivitas Custom -->
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Aktivitas Tambahan</label>
+                    <div id="custom-activities-list"></div>
+                    <button type="button" class="btn btn-secondary btn-sm mt-2" id="btn-add-custom">
+                        <i class="fas fa-plus"></i> Tambah Aktivitas
+                    </button>
+                    <div class="form-text">Tambahkan aktivitas seperti sarapan, packing, dll</div>
+                </div>
+
+                <!-- Tombol Aksi -->
+                <div class="d-flex gap-2 justify-content-between">
+                    <button type="button" class="btn btn-secondary" id="btn-back-start">
+                        <i class="fas fa-arrow-left"></i> Kembali
+                    </button>
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-success btn-fresh">
+                            <i class="fas fa-save"></i> Simpan & Hitung
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 
         <!-- Halaman Hasil -->
         <div id="page-result" class="page">
