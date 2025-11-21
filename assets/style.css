@@ -278,6 +278,12 @@ body.popup-active footer {
 .time-tercepat { background: #34D399; }
 .time-terlama { background: #FBBF24; }
 
+#chart-persentase {
+    height: 300px !important;
+    width: 300px !important;
+    margin: 0 auto;
+}
+
 /* FOOTER */
 .site-footer { background: var(--card-bg); border-top: 1px solid #E5E7EB; color: var(--text-muted); }
 
